@@ -13,13 +13,7 @@ export default function Home({results}) { //<--getServerSideProps에서 수행�
 
   const router = useRouter();
   const onClick = (id, title) =>{
-    router.push({
-      pathname: `/movies/${id}`,
-      query:{
-        id,
-        title
-      },
-    },`/movies/${id}`);//클라이언트엔 마스킹되서 나오고, 라우터에선 해당 정보가 보인다.
+    router.push(`/movies/${title}/${id}`);//클라이언트엔 마스킹되서 나오고, 라우터에선 해당 정보가 보인다.
     //해당 url로 정보를 숨기고 전달하는 방법
   }
 
@@ -30,12 +24,7 @@ export default function Home({results}) { //<--getServerSideProps에서 수행�
               <div onClick={()=>onClick(movie.id,movie.original_title)} className="movie" key={movie.id}>
                 <img src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`} />
                 <h4>
-                  <Link href={{
-                    pathname : `/movies/${movie.id}`,
-                    query: {
-                      title: movie.original_title,
-                    }
-                  }} as={`movies/${movie.id}`}>
+                  <Link href={`/movies/${movie.original_title}/${movie.id}`}>
                     <a>{movie.original_title}</a>
                   </Link>
                 </h4>
