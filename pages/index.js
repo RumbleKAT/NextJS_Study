@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import Seo from "../components/Seo";
+import { useRouter } from "next/router";
 
 const API_KEY = process.env.API_KEY;
 
@@ -9,13 +11,35 @@ export default function Home({results}) { //<--getServerSideProps에서 수행�
    즉시 페이지를 렌더링하는 경우,
   */
 
+  const router = useRouter();
+  const onClick = (id, title) =>{
+    router.push({
+      pathname: `/movies/${id}`,
+      query:{
+        id,
+        title
+      },
+    },`/movies/${id}`);//클라이언트엔 마스킹되서 나오고, 라우터에선 해당 정보가 보인다.
+    //해당 url로 정보를 숨기고 전달하는 방법
+  }
+
   return (
     <div className="container">
       <Seo title="Home" />
       {results?.map((movie) => (
-        <div className="movie" key={movie.id}>
-           <img src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`} />
-        </div>
+              <div onClick={()=>onClick(movie.id,movie.original_title)} className="movie" key={movie.id}>
+                <img src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`} />
+                <h4>
+                  <Link href={{
+                    pathname : `/movies/${movie.id}`,
+                    query: {
+                      title: movie.original_title,
+                    }
+                  }} as={`movies/${movie.id}`}>
+                    <a>{movie.original_title}</a>
+                  </Link>
+                </h4>
+              </div>
       ))}
       <style jsx>{`
         .container {
@@ -56,3 +80,5 @@ export async function getServerSideProps(){
     }
   }
 }
+
+//movies/:id
