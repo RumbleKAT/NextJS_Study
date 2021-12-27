@@ -3,22 +3,16 @@ import Seo from "../components/Seo";
 
 const API_KEY = process.env.API_KEY;
 
-export default function Home() {
-  const [movies, setMovies] = useState();
-  useEffect(()=>{
-   (async() => {
-     const { results } = await (
-        await fetch(`/api/movies`) //해당 링크의 경로로 API 호출정보를 마스킹한다. --> API 키를 보호하기 위함
-      ).json();
-      setMovies(results);
-     })();
-  },[]);
+export default function Home({results}) { //<--getServerSideProps에서 수행한 props가 여기에 전달된다. serverside로 수행하고 싶은경우
+  /*
+   => 모든 데이터가 다 보여주고 나서 데이터를 보여주고 싶을때
+   즉시 페이지를 렌더링하는 경우,
+  */
 
   return (
     <div className="container">
       <Seo title="Home" />
-      {!movies && <h4>Loading...</h4>}
-      {movies?.map((movie) => (
+      {results?.map((movie) => (
         <div className="movie" key={movie.id}>
            <img src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`} />
         </div>
@@ -46,4 +40,19 @@ export default function Home() {
       `}</style>
     </div>
   );
+}
+
+export async function getServerSideProps(){
+  //함수명은 고정형, api키를 숨시기 좋음 절대로 client에선 이 함수를 접근할수 없음
+  /*
+    frontend에선 /api/movies
+    backend에선 전체 url을 붙여준다.
+    ==> api가 응답받기 전까지 화면상에서 보여주지 않는다.
+  */
+  const { results } = await ( await fetch(`http://localhost:3000/api/movies`)).json();
+  return {
+    props :{
+      results,
+    }
+  }
 }
